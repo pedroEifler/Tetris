@@ -6,9 +6,9 @@ public class TetrisBlock : MonoBehaviour {
     public Vector3 rotationPoint;
     private float previousTime;
     public float fallTime = 0.8f;
-    private int height = 20;
-    private int widght = 10;
-    private static Transform[,] grid = new Transform[widght, height]
+    private static int height = 20;
+    private static int widght = 10;
+    private static Transform[,] grid = new Transform[widght, height];
 
     // Start is called before the first frame update 
     void Start () {
@@ -38,10 +38,20 @@ public class TetrisBlock : MonoBehaviour {
             transform.position += new Vector3 (0, -1, 0);
             if (!ValidMoviment ()) {
                 transform.position -= new Vector3 (0, -1, 0);
+                AddToGrid();
                 this.enabled = false;
-                FindObjectOfType<SpawnTetramino>().NewTetramino();
+                FindObjectOfType<SpawnTetramino> ().NewTetramino ();
             }
             previousTime = Time.time;
+        }
+    }
+
+    void AddToGrid () {
+        foreach (Transform children in transform) {
+            int roundedX = Mathf.RoundToInt (children.transform.position.x);
+            int roundedY = Mathf.RoundToInt (children.transform.position.y);
+
+            grid[roundedX, roundedY] = children;
         }
     }
 
@@ -51,6 +61,10 @@ public class TetrisBlock : MonoBehaviour {
             int roundedY = Mathf.RoundToInt (children.transform.position.y);
 
             if (roundedX < 0 || roundedX >= widght || roundedY < 0 || roundedY >= height) {
+                return false;
+            }
+
+            if (grid[roundedX, roundedY] != null) {
                 return false;
             }
         }
